@@ -24,7 +24,7 @@ import { useMoralis } from "react-moralis"
 import { Settings } from './pages/Settings';
 import { Signup } from './pages/SignUp';
 
-const Links = ['Home', 'Profile', 'SignUp', 'CreateNFT'];
+const Links = ['Home', 'Profile', 'SignUp', 'CreateDivePhoto'];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
