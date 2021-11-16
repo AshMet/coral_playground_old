@@ -5,6 +5,7 @@ import { Settings } from './pages/Settings'
 import SignUp from './pages/SignUp'
 import TopNav from './TopNav'
 import CreateDivePhoto from './pages/CreateDivePhoto'
+import MyDivePhotos from './pages/MyDivePhotos'
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/createdivephoto" element={<CreateDivePhoto />} />
+          <Route path="/mydivephotos" element={<MyDivePhotos />} />
       </Routes>
       
       {/* { isAuthenticated ? 
