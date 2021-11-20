@@ -56,7 +56,7 @@ export const Home = () => {
                     textDecor: "underline",
                 }}
                 >
-                { isAuthenticated ? `Welcome to Coral Playground ${user && user.attributes.username}` : "Please connect wallet to begin" }
+                { isAuthenticated ? `Welcome to Coral Playground ${user && user.attributes.username}` : "🦊 Please connect wallet to begin" }
                 </Link>
                 <chakra.p mt={2} color={useColorModeValue("gray.600", "gray.300")}>
                 Coral playground is an NFT marketplace for underwater photographers to sell their work with a portion of the sale 

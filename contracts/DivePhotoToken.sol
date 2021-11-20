@@ -25,6 +25,8 @@ contract DivePhotoToken is ERC721 {
 
         Items[newItemId] = Item(newItemId, msg.sender, uri);
 
+        // Add fucntionality to automatically approve marketplace to transfer the item on behalf of the user to save transaction fees
+
         return newItemId;
     }
 

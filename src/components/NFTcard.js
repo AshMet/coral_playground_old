@@ -52,7 +52,7 @@ import {
               height={230}
               width={282}
               objectFit={'cover'}
-              src={image.file}
+              src={image.file || props.tokenUri.image}
             />
           </Box>
           <Stack pt={10} align={'center'}>

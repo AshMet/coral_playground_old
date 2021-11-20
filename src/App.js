@@ -4,8 +4,11 @@ import UserProfileEdit from './pages/UserProfileEdit'
 import { Settings } from './pages/Settings'
 import SignUp from './pages/SignUp'
 import TopNav from './TopNav'
-import CreateDivePhoto from './pages/CreateDivePhoto'
+import CreateDivePhoto from './pages/DivePhotos/CreateDivePhoto'
 import MyDivePhotos from './pages/MyDivePhotos'
+import Marketplace from './pages/Marketplace'
+import MyProfile from './pages/Users/MyProfile'
+import LogIn from './pages/LogIn'
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
@@ -16,11 +19,23 @@ function App() {
       <TopNav />
       <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<UserProfileEdit />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="users">
+            {/* <Route path="/" element={<UsersIndex />} /> */}
+            {/* <Route path=":id" element={<UserProfile />} /> */}
+            <Route path="me" element={<MyProfile />} />
+          </Route>
+          <Route path="dive_photos">
+            <Route path="create" element={<CreateDivePhoto />} />
+          </Route>
+          <Route path="profile" element={<UserProfileEdit />} />
+          {/* <Route path="/profile/:id/edit" element={<UserProfileEdit />} /> */}
           <Route path="/settings" element={<Settings />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="signup" element={<SignUp />} />
+          <Route path="login" element={<LogIn />} />
           <Route path="/createdivephoto" element={<CreateDivePhoto />} />
           <Route path="/mydivephotos" element={<MyDivePhotos />} />
+          <Route path="/marketplace" element={<Marketplace />} />
       </Routes>
       
       {/* { isAuthenticated ? 

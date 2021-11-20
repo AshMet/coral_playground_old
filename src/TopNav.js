@@ -6,10 +6,10 @@ import {
   HStack,
   VStack,
   Text,
-  Link,
   IconButton,
   Button,
   Menu,
+  Link,
   MenuButton,
   MenuList,
   MenuItem,
@@ -23,10 +23,12 @@ import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { useMoralis } from "react-moralis"
 import { Settings } from './pages/Settings';
 import { Signup } from './pages/SignUp';
+import { useNavigate } from 'react-router';
 
-const Links = ['Home', 'Profile', 'SignUp', 'CreateDivePhoto', 'MyDivePhotos'];
+// const Links = ['Home', 'Profile', 'SignUp', 'CreateDivePhoto', 'MyDivePhotos', 'Marketplace'];
 
-const NavLink = ({ children }: { children: ReactNode }) => (
+
+const NavLink = (props) => (
   <Link
     px={2}
     py={1}
@@ -35,14 +37,15 @@ const NavLink = ({ children }: { children: ReactNode }) => (
       textDecoration: 'none',
       bg: useColorModeValue('gray.200', 'gray.700'),
     }}
-    href={children}>
-    {children}
+    href={props.link}>
+    {props.title}
   </Link>
 );
 
 export default function TopNav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuthenticated, logout, user, isAuthUndefined, isAuthenticating, authenticate } = useMoralis();
+  let navigate = useNavigate();
 
   return (
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -55,14 +58,19 @@ export default function TopNav() {
           onClick={isOpen ? onClose : onOpen}
         />
         <HStack spacing={8} alignItems={'center'}>
-          <Box>Coral Playground</Box>
+          <Box fontWeight="bold">Coral Playground</Box>
           <HStack
             as={'nav'}
             spacing={4}
             display={{ base: 'none', md: 'flex' }}>
-            {Links.map((link) => (
+              <NavLink link='/' title='Home' />
+              <NavLink link='marketplace' title='Marketplace' />
+              { isAuthenticated && <NavLink link='dive_photos/create' title='Create NFT' /> }
+              { isAuthenticated && <NavLink link='mydivephotos' title='My Dive Photos' /> }
+              }
+            {/* {Links.map((link) => (
               <NavLink key={link}>{link}</NavLink>
-            ))}
+            ))} */}
           </HStack>
         </HStack>
         <Flex alignItems={'center'}>
@@ -76,42 +84,39 @@ export default function TopNav() {
           </Menu>
         </Flex>
         <HStack spacing={{ base: '0', md: '6' }}>
-          { !isAuthenticated && 
+          { !isAuthenticated ? 
             <Stack direction="row" spacing={4}>
               <IconButton
-                isLoading={isAuthenticating} onClick={() => authenticate()}
+                isLoading={isAuthenticating} 
+                onClick={() => authenticate()}
                 size="lg"
                 variant="ghost"
                 aria-label="Connect Wallet"
                 icon={<IoWalletOutline />}
               />
               {/* Links are  not working here yet */}
-              <Link to="/signin">
+              <Link href="login">
                 <Button leftIcon={<IoLogInOutline />} colorScheme="teal" variant="solid">
-                  Sign In
+                  Log In
                 </Button>
               </Link>
-              <Link to="/signup">
+              <Link href="signup">
                 <Button leftIcon={<IoLogInOutline />} colorScheme="teal" variant="outline">
                   Sign Up
                 </Button>
               </Link>
             </Stack>
-          }
-          { isAuthenticated && 
-            <Flex alignItems={'center'}>
+          : <Flex alignItems={'center'}>
               <Menu>
                 <MenuButton
                   py={2}
                   transition="all 0.3s"
                   _focus={{ boxShadow: 'none' }}>
                   <HStack>
-                    { isAuthenticated && 
-                      <Avatar
-                        name={user.attributes.username }
-                        size={'sm'}
-                      />
-                    }
+                    <Avatar
+                      name={user.attributes.username }
+                      size={'sm'}
+                    />
                     <VStack
                       display={{ base: 'none', md: 'flex' }}
                       alignItems="flex-start"
@@ -119,7 +124,7 @@ export default function TopNav() {
                       ml="2">
                       <Text fontSize="sm">{user && user.attributes.username }</Text>
                       <Text fontSize="xs" color="gray.600">
-                        Admin
+                        User
                       </Text>
                     </VStack>
                     <Box display={{ base: 'none', md: 'flex' }}>
@@ -128,10 +133,11 @@ export default function TopNav() {
                   </HStack>
                 </MenuButton>
                 <MenuList>
-                  <MenuItem><Link to="Profile">Profile</Link></MenuItem>
-                  <MenuItem><Link to="Settings">Settings</Link></MenuItem>
+                  <MenuItem><Link href="profile">Profile</Link></MenuItem>
+                  <MenuItem><Link href="settings">Settings</Link></MenuItem>
                   <MenuDivider />
-                  <MenuItem><Button
+                  <MenuItem>
+                    <Button
                       onClick={() => logout()}
                       variant={'link'}
                       colorScheme={'teal'}
@@ -151,9 +157,12 @@ export default function TopNav() {
       {isOpen ? (
         <Box pb={4} display={{ md: 'none' }}>
           <Stack as={'nav'} spacing={4}>
-            {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
-            ))}
+            <NavLink link='/' title='Home' />
+            <NavLink link='profile' title='Profile' />
+            <NavLink link='signup' title='Signup' />
+            <NavLink link='divephoto/create' title='Create NFT' />
+            <NavLink link='mydivephotos' title='My Dive Photos' />
+            <NavLink link='marketplace' title='Marketplace' />
           </Stack>
         </Box>
       ) : null}

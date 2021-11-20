@@ -26,9 +26,10 @@ import {
 import { BsPerson } from 'react-icons/bs';
 import { useState, useEffect } from "react";
 import { useMoralis, useNewMoralisObject } from "react-moralis";
-import { ErrorBox } from '../Error';
-import tokenContractAbi from '../abi';
-// import { Navigate } from "react-router-dom";
+import { ErrorBox } from '../../Error';
+import { tokenContractAbi, marketplaceContractAbi } from '../../abi';
+import ReactFileReader from 'react-file-reader';
+import { useNavigate } from "react-router-dom";
 
 export default function CreateDivePhoto() {
     const { user, Moralis } = useMoralis();
@@ -38,29 +39,41 @@ export default function CreateDivePhoto() {
     const [ description, setNFTdescription ] = useState();
     const [ price, setNFTprice ] = useState();
     const [ status, setNFTstatus ] = useState();
-    const [ nftPhoto, setNFTphoto ] = useState();
+    const [ image, setImage ] = useState();
+    const [ imgData, setImgData] = useState();
 
-    // const navigate = Navigate();
+    let navigate = useNavigate();
 
-    const nftContractAddress = '0x31bFEc7f6c72726589f5515F9E0BE1c333e1DC55';
+    const nftContractAddress = '0x6201e4cb3441205062CbDb0eCA9B3F378031F1b8';
+    const marketplaceContractAddress = '0x1f02a40a52f05655dd1d3599761514cE18911B71';
 
     useEffect(() => {
         if (!object) return null;
         setNFTname(object.nftName)
         setNFTprice(object.nftPrice)
         setNFTdescription(object.nftDescription)
+        setImage(object.image);
         // setNFTfile(object.attributes?.nftFile?._url);
     }, [object])
 
     const onChangePhoto = (e) => {
-        setNFTphoto(e.target.files[0]);
+        setImage(e.target.files[0]);
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+            setImgData(reader.result);
+        });
+        reader.readAsDataURL(e.target.files[0]);
     };
 
     const handleSave = async (e) => {
-        const nftFile = new Moralis.File("DivePhoto.jpg", nftPhoto)
-        await nftFile.saveIPFS();
-        const nftFilePath = nftFile.ipfs();
-        const nftFileHash = nftFile.hash();
+        const web3 = await Moralis.enableWeb3()
+        const userAddress = user.get('ethAddress')
+        const marketplaceContract = new web3.eth.Contract(marketplaceContractAbi, marketplaceContractAddress )
+
+        const nftFile = new Moralis.File("DivePhoto.jpg", image)
+        await nftFile.saveIPFS()
+        const nftFilePath = nftFile.ipfs()
+        const nftFileHash = nftFile.hash()
 
         const metadata = {
             name: name,
@@ -71,15 +84,30 @@ export default function CreateDivePhoto() {
 
         const nftMetadata = new Moralis.File("metadata.json", {base64: btoa(JSON.stringify(metadata))} );
         await nftMetadata.saveIPFS();
-
         const nftMetadataFilePath = nftMetadata.ipfs();
         const nftMetadataFileHash = nftMetadata.hash();
-
         const nftId = await mintNFT(nftMetadataFilePath)
         
         await save({ user, name, price, description, nftFilePath, nftFileHash, nftMetadataFilePath, nftMetadataFileHash, status, nftId, nftContractAddress })
-        // Navigate("/Home")
+        await sendToMarketplace(status, nftId, marketplaceContract, userAddress)
+        navigate("/mydivephotos")
     }
+
+    const sendToMarketplace = async (param, nftId, marketplaceContract, userAddress) => {
+        switch (param) {
+            case "no_sale": 
+                return;
+            case "insta_buy" : 
+                await ensureMarketplaceIsApproved(nftId, nftContractAddress);
+                await marketplaceContract.methods.addItemToMarket(nftId, nftContractAddress, price).send({from: userAddress});
+                break;
+            case "accept_offer":
+                alert("Not yet supported");
+                return;
+            default:
+                break;
+        }
+    };
 
     const mintNFT = async (metadataUrl) => {
         const web3 = await Moralis.enableWeb3();
@@ -87,11 +115,24 @@ export default function CreateDivePhoto() {
 
         let receipt = await tokenContract.methods
             .createItem(metadataUrl)
-            .send({ from: user.attributes.ethAddress })
+            // .send({ from: user.attributes.ethAddress })
+            .send({ from: window.ethereum.selectedAddress })
             // .then((response) => console.log(response))
             // .catch((err) => ErrorBox(err.message));
         
         console.log(receipt)
+        return receipt.events.Transfer.returnValues.tokenId;
+    };
+
+    const ensureMarketplaceIsApproved = async (tokenId, tokenAddress) => {
+        const web3 = await Moralis.enableWeb3();
+        const userAddress = user.get('ethAddress');
+        const contract = new web3.eth.Contract(tokenContractAbi, tokenAddress );
+        const approvedAddress = await contract.methods.getApproved(tokenId).call({from: userAddress})
+        if (approvedAddress != marketplaceContractAddress) {
+            await contract.methods.approve(marketplaceContractAddress, tokenId).send({from: userAddress})
+        }
+
     };
 
     return (
@@ -104,14 +145,16 @@ export default function CreateDivePhoto() {
                 borderRadius="lg"
                 m={{ sm: 4, md: 16, lg: 10 }}
                 p={{ sm: 5, md: 5, lg: 16 }}>
+                <VStack align="center" >
+                    <Heading>Create your NFT</Heading>
+                    <Text mt={{ sm: 3, md: 3, lg: 5 }} color="gray.500">
+                        Add your dive photo below to mint your nft
+                    </Text>
+                </VStack>
                 <Box p={4}>
                     <Wrap spacing={{ base: 20, sm: 3, md: 5, lg: 20 }}>
                     <WrapItem>
                         <Box>
-                            <Heading>Create your NFT</Heading>
-                            <Text mt={{ sm: 3, md: 3, lg: 5 }} color="gray.500">
-                                Add your dive photo below to mint your nft
-                            </Text>
                             <Center py={12}>
                                 <Box
                                     role={'group'}
@@ -136,7 +179,7 @@ export default function CreateDivePhoto() {
                                         pos: 'absolute',
                                         top: 5,
                                         left: 0,
-                                        backgroundImage: `url('https://images.unsplash.com/photo-1518051870910-a46e30d9db16?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80')`,
+                                        backgroundImage: `url(${imgData || "https://cdn.pixabay.com/photo/2017/04/20/07/08/select-2244784_1280.png"})`,
                                         filter: 'blur(15px)',
                                         zIndex: -1,
                                     }}
@@ -150,19 +193,19 @@ export default function CreateDivePhoto() {
                                         height={230}
                                         width={282}
                                         objectFit={'cover'}
-                                        src={nftPhoto}
+                                        src={imgData || "https://cdn.pixabay.com/photo/2017/04/20/07/08/select-2244784_1280.png"}
                                     />
                                     </Box>
                                     <Stack pt={10} align={'center'}>
-                                    <Text color={'gray.500'} fontSize={'sm'} textTransform={'uppercase'}>
-                                        Title
-                                    </Text>
-                                    <Heading fontSize={'2xl'} fontFamily={'body'} fontWeight={500}>
-                                        Subtitle
+                                    <Heading fontSize={'2xl'} fontFamily={'body'} fontWeight={500} textTransform={'uppercase'}>
+                                        {name}
                                     </Heading>
+                                    <Text color={'gray.500'} fontSize={'sm'}>
+                                        {description}
+                                    </Text>
                                     <Stack direction={'row'} align={'center'}>
                                         <Text fontWeight={800} fontSize={'xl'}>
-                                        $57
+                                        {price} ETH
                                         </Text>
                                         <Text textDecoration={'line-through'} color={'gray.600'}>
                                         $199
@@ -181,7 +224,7 @@ export default function CreateDivePhoto() {
                         </Box>
                     </WrapItem>
                     <WrapItem>
-                        <Box bg="white" borderRadius="lg">
+                        <Box bg="white" borderRadius="lg" marginTop="5" >
                         <Box m={8} color="#0B0E3F">
                             <VStack spacing={5}>
                             <FormControl id="nftname">

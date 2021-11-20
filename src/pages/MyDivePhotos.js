@@ -1,7 +1,7 @@
 import { UnorderedList, ListItem, Text } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useMoralisCloudFunction } from "react-moralis";
-import NFTcard from "../components/NFTcard";
+import DivePhotoDetails from "./DivePhotos/DivePhotoDetails";
 
 
 export default function MyDivePhotos() { 
@@ -24,11 +24,25 @@ export default function MyDivePhotos() {
     }
     
     if (ownedNFTs && ownedNFTs.length > 0) {
-        for (var i = 0; i < ownedNFTs.length; i++) {
-            var nft = ownedNFTs[i];
-            return(<NFTcard tokenId={nft.tokenId} tokenAddress={nft.tokenAddress} symbol={nft.symbol} tokenUri={nft.tokenUri} />)
-         }
-      } else { return <Text> Nothing to Display</Text>}
+          
+        return (
+           ownedNFTs.map((nft) =>
+                <DivePhotoDetails tokenId={nft.tokenId} tokenAddress={nft.tokenAddress} symbol={nft.symbol} tokenUri={nft.tokenUri} />)
+        )
+        
+        // for (var i = 0; i < ownedNFTs.length; i++) {
+        //     var nft = ownedNFTs[i];
+        //     return(<NFTcard tokenId={nft.tokenId} tokenAddress={nft.tokenAddress} symbol={nft.symbol} tokenUri={nft.tokenUri} />)
+        // }
+      } else { return <Text> Nothing to Display</Text> }
+
+
+    // const cardList = function () => {
+    //     for (var i = 0; i < ownedNFTs.length; i++) {
+    //         var nft = ownedNFTs[i];
+    //         return(<NFTcard tokenId={nft.tokenId} tokenAddress={nft.tokenAddress} symbol={nft.symbol} tokenUri={nft.tokenUri} />)
+    //     }
+    // }
 
 }
 

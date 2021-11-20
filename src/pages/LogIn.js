@@ -14,12 +14,12 @@ import {
   } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useMoralis } from "react-moralis";
-import { useNavigate } from 'react-router';
+import { useNavigate } from "react-router-dom";
 import { ErrorBox } from '../Error';
 
 
-export default function SignUp() {
-    const { authenticate, isAuthenticating, authError, signup } = useMoralis();
+export default function LogIn() {
+    const { login, logout, authenticate, isAuthenticating, authError, isAuthenticated } = useMoralis()
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
 
@@ -34,7 +34,7 @@ export default function SignUp() {
         {authError && ( <ErrorBox title="Authentication Failed" message={authError.message} /> )}
         <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
           <Stack align={'center'}>
-            <Heading fontSize={'4xl'}>Sign up for a new account</Heading>
+            <Heading fontSize={'4xl'}>Log in to your account</Heading>
             <Text fontSize={'lg'} color={'gray.600'}>
               to enjoy all of our cool <Link color={'blue.400'}>features</Link> ✌️
             </Text>
@@ -62,19 +62,28 @@ export default function SignUp() {
                   <Checkbox>Remember me</Checkbox>
                   <Link color={'blue.400'}>Forgot password?</Link>
                 </Stack>
-                <Button
-                  onClick={() => {signup(email, password, email); navigate('/')}}
-                  bg={'blue.400'}
-                  color={'white'}
-                  _hover={{
-                    bg: 'blue.500',
-                  }}>
-                  Sign Up with Email
-                </Button>
+                { isAuthenticated ? 
+                  <Button
+                    onClick={ () => {logout(); navigate('/')} }
+                    bg={'blue.400'}
+                    color={'white'}
+                    _hover={{
+                      bg: 'blue.500' }}>
+                    Log Out
+                  </Button>
+                : <Button
+                    onClick={() => {login(email, password); navigate('/')}}
+                    bg={'blue.400'}
+                    color={'white'}
+                    _hover={{
+                      bg: 'blue.500' }}>
+                    Log In
+                  </Button>}
+                
                 <Text align={'center'} my={2}> OR </Text>
                 <Button
                   isLoading={isAuthenticating}
-                  onClick={() => {authenticate(); navigate('/')}}
+                  onClick={() => authenticate()}
                   bg={'red.400'}
                   color={'white'}
                   _hover={{
