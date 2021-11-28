@@ -6,8 +6,9 @@ import SignUp from './pages/SignUp'
 import TopNav from './TopNav'
 import CreateDivePhoto from './pages/DivePhotos/CreateDivePhoto'
 import MyDivePhotos from './pages/MyDivePhotos'
+import ViewDivePhoto from './pages/DivePhotos/ViewDivePhoto'
 import Marketplace from './pages/Marketplace'
-import MyProfile from './pages/Users/MyProfile'
+import ViewProfile from './pages/Users/ViewProfile'
 import LogIn from './pages/LogIn'
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
@@ -19,23 +20,20 @@ function App() {
       <TopNav />
       <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="users">
-            {/* <Route path="/" element={<UsersIndex />} /> */}
-            {/* <Route path=":id" element={<UserProfile />} /> */}
-            <Route path="me" element={<MyProfile />} />
-          </Route>
           <Route path="dive_photos">
             <Route path="create" element={<CreateDivePhoto />} />
+            {/* <Route path=":id" element={<ViewDivePhoto />} /> */}
           </Route>
           <Route path="profile" element={<UserProfileEdit />} />
           {/* <Route path="/profile/:id/edit" element={<UserProfileEdit />} /> */}
-          <Route path="/settings" element={<Settings />} />
+          <Route path="user/settings" element={<UserProfileEdit />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="login" element={<LogIn />} />
-          <Route path="/createdivephoto" element={<CreateDivePhoto />} />
-          <Route path="/mydivephotos" element={<MyDivePhotos />} />
-          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="createdivephoto" element={<CreateDivePhoto />} />
+          <Route path="mydivephotos" element={<MyDivePhotos />} />
+          <Route path="marketplace" element={<Marketplace />} />
+          <Route path="divephoto/:uid" element={<ViewDivePhoto />} />
+          <Route path="user/me" element={<ViewProfile />} />
       </Routes>
       
       {/* { isAuthenticated ? 

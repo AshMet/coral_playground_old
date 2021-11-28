@@ -27,7 +27,11 @@ export default function MyDivePhotos() {
           
         return (
            ownedNFTs.map((nft) =>
-                <DivePhotoDetails tokenId={nft.tokenId} tokenAddress={nft.tokenAddress} symbol={nft.symbol} tokenUri={nft.tokenUri} />)
+                <DivePhotoDetails nft={nft} />)
+                // tokenId={nft.tokenId}
+                // tokenAddress={nft.tokenAddress}
+                // symbol={nft.symbol}
+                // tokenUri={nft.tokenUri} 
         )
         
         // for (var i = 0; i < ownedNFTs.length; i++) {

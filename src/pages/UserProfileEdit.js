@@ -19,49 +19,42 @@ import { SmallCloseIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from "react";
 import { useMoralis, useMoralisFile } from "react-moralis";
 import { ErrorBox } from "../Error";
+import ReactFileReader from 'react-file-reader';
 import { useNavigate } from 'react-router-dom';
  
 export default function UserProfileEdit(): JSX.Element {
-  const { user, setUserData, userError, isUserUpdating } = useMoralis();
-  const { saveFile, moralisFile } = useMoralisFile();
+  const { user, Moralis, setUserData, userError, isUserUpdating } = useMoralis();
   const [username, setUsername] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [photoFile, setPhotoFile] = useState();
-  const [photoFileName, setPhotoFileName] = useState();
-  const [profilePic, setProfilePic] = useState();
+  const [avatar, setAvatar] = useState();
+  const [avatarData, setAvatarData] = useState();
   const navigate = useNavigate()
 
   useEffect(() => {
       if (!user) return null;
       setUsername(user.get("username"))
       setEmail(user.get("email"))
-      // getAvatar(user.get("avatar"))
-      setProfilePic(user.attributes?.profilePic?._url);
   }, [user])
 
-  const onChangePhoto = (e) => {
-    setPhotoFile(e.target.files[0]);
-    setPhotoFileName(e.target.files[0].name);
+  const onChangeAvatar = (e) => {
+    setAvatar(e.target.files[0]);
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setAvatarData(reader.result);
+    });
+    reader.readAsDataURL(e.target.files[0]);
   };
 
-  const submitPhoto = async (e) => {
-    const file = photoFile;
-    const name = photoFileName;
-    let fileIpfs = await saveFile(name, file, { saveIPFS: true });
-    user.set("profilePic", fileIpfs);
-    await user.save();
-    setProfilePic(user.attributes.profilePic._url);
-  };
+  const handleSave = async (e) => {
+    const avatarFile = new Moralis.File("Avatar.jpg", avatar)
 
-
-  const handleSave = () => {
-      setUserData({
-          username,
-          email,
-          password: password === "" ? undefined : password
-      })
-      submitPhoto()
+    setUserData({
+        username,
+        email,
+        password: password === "" ? undefined : password,
+        avatar: avatarFile
+    })
   }
   
   return (
@@ -87,7 +80,7 @@ export default function UserProfileEdit(): JSX.Element {
           <FormLabel>User Icon</FormLabel>
           <Stack direction={['column', 'row']} spacing={6}>
             <Center>
-              <Avatar size="xl" src={profilePic}>
+              <Avatar size="xl" src={avatarData}>
                 <AvatarBadge
                   as={IconButton}
                   size="sm"
@@ -104,8 +97,8 @@ export default function UserProfileEdit(): JSX.Element {
               accept="image/*"
               w="full"
               multiple={false}
-              id="profilePhoto"
-              onChange={onChangePhoto} />
+              id="profileavatar"
+              onChange={onChangeAvatar} />
               {/* <Button w="full">Change Avatar</Button> */}
             </Center>
           </Stack>

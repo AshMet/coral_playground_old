@@ -44,8 +44,8 @@ export default function CreateDivePhoto() {
 
     let navigate = useNavigate();
 
-    const nftContractAddress = '0x6201e4cb3441205062CbDb0eCA9B3F378031F1b8';
-    const marketplaceContractAddress = '0x1f02a40a52f05655dd1d3599761514cE18911B71';
+    const nftContractAddress = '0xAb97946F032c912f1F71D500B8761cb763F9cd9A';
+    const marketplaceContractAddress = '0x7733E6fb52bBD3C878A37AdcdD1C0B52578cbFd1';
 
     useEffect(() => {
         if (!object) return null;
@@ -82,10 +82,10 @@ export default function CreateDivePhoto() {
             // nftFileHash: nftFileHash
         }
 
-        const nftMetadata = new Moralis.File("metadata.json", {base64: btoa(JSON.stringify(metadata))} );
-        await nftMetadata.saveIPFS();
-        const nftMetadataFilePath = nftMetadata.ipfs();
-        const nftMetadataFileHash = nftMetadata.hash();
+        const nftMetadata = new Moralis.File( "metadata.json", {base64: btoa(JSON.stringify(metadata))} )
+        await nftMetadata.saveIPFS()
+        const nftMetadataFilePath = nftMetadata.ipfs()
+        const nftMetadataFileHash = nftMetadata.hash()
         const nftId = await mintNFT(nftMetadataFilePath)
         
         await save({ user, name, price, description, nftFilePath, nftFileHash, nftMetadataFilePath, nftMetadataFileHash, status, nftId, nftContractAddress })
@@ -93,8 +93,8 @@ export default function CreateDivePhoto() {
         navigate("/mydivephotos")
     }
 
-    const sendToMarketplace = async (param, nftId, marketplaceContract, userAddress) => {
-        switch (param) {
+    const sendToMarketplace = async (status, nftId, marketplaceContract, userAddress) => {
+        switch (status) {
             case "no_sale": 
                 return;
             case "insta_buy" : 
@@ -132,7 +132,6 @@ export default function CreateDivePhoto() {
         if (approvedAddress != marketplaceContractAddress) {
             await contract.methods.approve(marketplaceContractAddress, tokenId).send({from: userAddress})
         }
-
     };
 
     return (
@@ -140,7 +139,7 @@ export default function CreateDivePhoto() {
             {error && <ErrorBox error={error} />}
             <Flex>
                 <Box
-                bg="#02054B"
+                bg={useColorModeValue('purple.900', 'purple.900')}
                 color="white"
                 borderRadius="lg"
                 m={{ sm: 4, md: 16, lg: 10 }}
@@ -303,3 +302,99 @@ export default function CreateDivePhoto() {
         </Container>
     );
 }
+
+
+
+
+// Moralis.Cloud.define("getUserNFTs", async (request) => {
+  
+//     const query = new Moralis.Query("EthNFTOwners");
+//     query.equalTo("contract_type", "ERC721");
+//     query.containedIn("owner_of", request.user.attributes.accounts);
+//     const queryResults = await query.find();
+//     const results = [];
+    
+//     for (let i = 0; i < queryResults.length; ++i) {
+//       results.push({
+//         "id": queryResults[i].attributes.objectId,
+//         "tokenId": queryResults[i].attributes.token_id,
+//         "tokenAddress": queryResults[i].attributes.token_address,
+//         "symbol": queryResults[i].attributes.symbol,
+//        	"tokenUri": queryResults[i].attributes.token_uri
+//       });
+//     }
+//     return results;
+//   	logger.info("Debugger test - 10pm");
+//   	logger.info(`Debugging results: ${results}`);
+// });
+
+// Moralis.Cloud.beforeSave("ItemsForSale", async (request) => {
+  
+//   	logger.info(`Debugging request: ${request}`);
+//     const query = new Moralis.Query("EthNFTOwners");
+//     query.equalTo("token_address", request.object.get("tokenAddress"));
+//     query.equalTo("token_id", request.object.get("tokenId"));
+//     const object = await query.first();
+//   	logger.info(`Debugging object: ${object}`);
+//   	if(object){
+//     	const owner = object.attributes.owner_of;
+//       	const userQuery = Moralis.Query(Moralis.User);
+//       	userQuery.equalTo("accounts", owner);
+//       	const userObject = await userQuery.first({useMasterKey: true});
+//       	if(userObject) {
+//         	request.object.set('user', userObject);
+//         }
+//         request.object.set('token', object);
+//     }
+// });
+
+// Moralis.Cloud.beforeSave("SoldItems", async (request) => {
+  
+//     const query = new Moralis.Query("DivePhotosForSale");
+//     query.equalTo("uid", request.object.get("uid"));
+//     const item = await query.first();
+//   	if(item){
+//       	request.object.set('item', item);
+//       	item.set("isSold", true);
+//       	await item.save();
+      
+//       	const userQuery = Moralis.Query(Moralis.User);
+//       	userQuery.equalTo("accounts", request.object.get('buyer'));
+//       	const userObject = await userQuery.first({useMasterKey: true});
+//       	if(userObject) {
+//         	request.object.set('user', userObject);
+//         }
+//     }
+// });
+
+// Moralis.Cloud.define("getMarketplaceNFTs", async (request) => {
+//     const query = new Moralis.Query("ItemsForSale");
+//     query.notEqualTo("isSold", true);
+//   	if(request.user) {
+//     	query.notContainedIn("token.owner_of", request.user.attributes.accounts);
+//     }
+//     const queryResults = await query.find({useMasterKey: true});
+//     const results = [];
+  
+//     query.select("uid", "tokenAddress", "tokenId", "askingPrice", "token.token_uri", "token.symbol", "token.owner_of", "user.username", "user.avatar" )
+    
+//     for (let i = 0; i < queryResults.length; ++i) {
+      
+//   	  if( queryResults[i].attributes.token || queryResults[i].attributes.user ) continue;
+      
+//       results.push({
+//         "uid": queryResults[i].attributes.uid,
+//         "tokenId": queryResults[i].attributes.token_id,
+//         "tokenAddress": queryResults[i].attributes.token_address,
+//         "askingPrice": queryResults[i].attributes.askingPrice,
+        
+//         "symbol": queryResults[i].attributes.token.attributes.symbol,
+//        	"tokenUri": queryResults[i].attributes.token.attributes.token_uri,
+//         "ownerOf": queryResults[i].attributes.token.attributes.owner_of,
+        
+//         "sellerUsername": queryResults[i].attributes.user.attributes.username,
+//         "sellerAvatar": queryResults[i].attributes.user.attributes.avatar,
+//       });
+//     }
+//     return results;
+// });

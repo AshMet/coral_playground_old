@@ -10,8 +10,47 @@ import {
   Button,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { useState, useEffect } from 'react';
+import { useMoralis } from "react-moralis";
+import { useNavigate } from "react-router-dom";
+import { marketplaceContractAbi } from '../abi';
 
 export default function MarketplaceCard(props) {
+    const { user, Moralis } = useMoralis();
+    let navigate = useNavigate();
+    const marketplaceContractAddress = '0x7733E6fb52bBD3C878A37AdcdD1C0B52578cbFd1';
+
+    const [ isLoading, setLoading ] = useState(true);
+    const [ imageUrl, setImageUrl ] = useState();
+
+    useEffect(() => {
+      async function getNFTurl() {
+        try {
+          let response = await fetch(props.nft.tokenUri);
+          let responseJson = await response.json();
+          setImageUrl(responseJson.image);
+        } catch(error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+      getNFTurl();
+    }, []);
+
+    const buyNFT = async function (nft) {
+        const web3 = await Moralis.enableWeb3()
+        const userAddress = user.get('ethAddress')
+        const marketplaceContract = new web3.eth.Contract(marketplaceContractAbi, marketplaceContractAddress )
+
+        if(!user) {
+            navigate('login')
+            return;
+            // Need to add a notification box after navigation
+        }
+        await marketplaceContract.methods.buyItem(nft.uid).send({from: userAddress, value: nft.askingPrice})
+    }
+
   return (
     <Center py={6}>
       <Box
@@ -30,10 +69,9 @@ export default function MarketplaceCard(props) {
           mb={6}
           pos={'relative'}>
           <Image
-            src={
-              'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-            }
+            src={ imageUrl }
             layout={'fill'}
+            onClick={ () => navigate(`/divephoto/${props.nft.uid}`)}
           />
         </Box>
         <Stack>
@@ -43,16 +81,16 @@ export default function MarketplaceCard(props) {
             fontWeight={800}
             fontSize={'sm'}
             letterSpacing={1.1}>
-            {`Item ID: ${props.item.uid}`}
+            {`Item ID: ${props.nft.uid}`}
           </Text>
           <Heading
             color={useColorModeValue('gray.700', 'white')}
             fontSize={'2xl'}
             fontFamily={'body'}>
-            {props.item.name}
+            {props.nft.name}
           </Heading>
           <Text color={'gray.500'}>
-            {props.item.description}
+            {props.nft.description}
           </Text>
         </Stack>
         <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
@@ -64,14 +102,14 @@ export default function MarketplaceCard(props) {
             <Text fontWeight={600}>Achim Rolle</Text>
             <Text color={'gray.500'}>Feb 08, 2021 · 6min read</Text>
             <Button
-                // onClick={handleSave}
+                onClick={ () => buyNFT(props.nft) }
                 // isLoading={ isSaving }
                 // disabled={ isSaving }
                 variant="solid"
                 bg="#0D74FF"
                 color="white"
                 _hover={{}}>
-                {`Buy now for ${props.item.askingPrice}`}
+                {`Buy now for ${props.nft.askingPrice}`}
             </Button>
           </Stack>
         </Stack>

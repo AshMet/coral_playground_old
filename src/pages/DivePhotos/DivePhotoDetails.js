@@ -12,28 +12,27 @@ import {
     createIcon,
     IconProps,
   } from '@chakra-ui/react';
-  // import { useState, useEffect } from 'react';
+  import { useState, useEffect } from 'react';
   
 
   export default function DivePhotoDetails(props) {
-    // const [ isLoading, setLoading ] = useState(true);
-    // const [ imageUrl, setImageUrl ] = useState();
+    const [ isLoading, setLoading ] = useState(true);
+    const [ imageUrl, setImageUrl ] = useState();
 
-    // const getNTFimage = async function(props) {
-    //   try {
-    //     let response = await fetch(props.tokenUri);
-    //     let responseJson = await response.json();
-    //     setImageUrl(responseJson.image);
-    //   } catch(error) {
-    //     console.error(error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // }
-    
-    // useEffect(() => {
-    //   setImageUrl(imageUrl);
-    // }, [imageUrl]);
+    useEffect(() => {
+      async function getNFTurl() {
+        try {
+          let response = await fetch(props.nft.tokenUri);
+          let responseJson = await response.json();
+          setImageUrl(responseJson.image);
+        } catch(error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+      getNFTurl();
+    }, []);
 
     return (
       <Container maxW={'7xl'}>
@@ -61,18 +60,18 @@ import {
                     bg: 'purple.900',
                     zIndex: -1,
                   }}>
-                  {props.symbol}
+                  {props.nft.symbol}
                 </Text>
                 <br />
                 <Text as={'span'} color={'purple.800'}>
-                  {`Token #${props.tokenId}`}
+                  {`Token #${props.nft.tokenId}`}
                 </Text>
               </Heading>
               <Text color={'gray.500'}>
-                {`Token URI: ${props.tokenUri}`}
+                {`Token URI: ${props.nft.tokenUri}`}
               </Text>
               <Text color={'gray.500'}>
-                {`Token Address: ${props.tokenAddress}`}
+                {`Token Address: ${props.nft.tokenAddress}`}
               </Text>
               <Stack
                 spacing={{ base: 4, sm: 6 }}
@@ -137,8 +136,8 @@ import {
                   align={'center'}
                   w={'100%'}
                   h={'100%'}
-                  // isLoading={ isLoading }
-                  src={"https://i.natgeofe.com/n/2cafafdc-debc-409c-82b3-e7309c9d580d/yourshot-underwater-11281018.jpg?w=636&h=424"}
+                  isLoading={ isLoading }
+                  src={ imageUrl }
                 />
               </Box>
             </Flex>

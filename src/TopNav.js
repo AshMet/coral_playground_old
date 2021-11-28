@@ -32,10 +32,11 @@ const NavLink = (props) => (
   <Link
     px={2}
     py={1}
+    color={useColorModeValue('gray.100', 'gray.200')}
     rounded={'md'}
     _hover={{
       textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
+      bg: useColorModeValue('pink.600', 'pink.600'),
     }}
     href={props.link}>
     {props.title}
@@ -48,7 +49,7 @@ export default function TopNav() {
   let navigate = useNavigate();
 
   return (
-    <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
+    <Box bg={useColorModeValue('purple.900', 'purple.900')} px={4}>
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <IconButton
           size={'md'}
@@ -58,7 +59,7 @@ export default function TopNav() {
           onClick={isOpen ? onClose : onOpen}
         />
         <HStack spacing={8} alignItems={'center'}>
-          <Box fontWeight="bold">Coral Playground</Box>
+          <Box fontWeight="bold" color={useColorModeValue('pink.400', 'pink.600')}>Coral Playground</Box>
           <HStack
             as={'nav'}
             spacing={4}
@@ -122,8 +123,8 @@ export default function TopNav() {
                       alignItems="flex-start"
                       spacing="1px"
                       ml="2">
-                      <Text fontSize="sm">{user && user.attributes.username }</Text>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="sm" color="gray.200">{user && user.attributes.username }</Text>
+                      <Text fontSize="xs" color="gray.400">
                         User
                       </Text>
                     </VStack>
@@ -133,8 +134,9 @@ export default function TopNav() {
                   </HStack>
                 </MenuButton>
                 <MenuList>
-                  <MenuItem><Link href="profile">Profile</Link></MenuItem>
-                  <MenuItem><Link href="settings">Settings</Link></MenuItem>
+                  <MenuItem><Link href={`/user/me`}>Profile</Link></MenuItem>
+                  {/* onClick={ () => navigate(`/divephoto/${props.nft.uid}`)} */}
+                  <MenuItem><Link href="profile">Settings</Link></MenuItem>
                   <MenuDivider />
                   <MenuItem>
                     <Button
