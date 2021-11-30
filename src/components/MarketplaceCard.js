@@ -21,6 +21,7 @@ export default function MarketplaceCard(props) {
     const marketplaceContractAddress = '0x7733E6fb52bBD3C878A37AdcdD1C0B52578cbFd1';
 
     const [ isLoading, setLoading ] = useState(true);
+    const [ isMinting, setMinting ] = useState(false);
     const [ imageUrl, setImageUrl ] = useState();
 
     useEffect(() => {
@@ -70,6 +71,7 @@ export default function MarketplaceCard(props) {
           pos={'relative'}>
           <Image
             src={ imageUrl }
+            isLoading={ isLoading }
             layout={'fill'}
             onClick={ () => navigate(`/divephoto/${props.nft.uid}`)}
           />
@@ -95,21 +97,21 @@ export default function MarketplaceCard(props) {
         </Stack>
         <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
           <Avatar
-            src={'https://avatars0.githubusercontent.com/u/1164541?v=4'}
+            src={props.nft.sellerAvatar?._url}
             alt={'Author'}
           />
-          <Stack direction={'column'} spacing={0} fontSize={'sm'}>
-            <Text fontWeight={600}>Achim Rolle</Text>
-            <Text color={'gray.500'}>Feb 08, 2021 · 6min read</Text>
+          <Stack direction={'column'} spacing={2} fontSize={'sm'}>
+            <Text fontWeight={600}>{props.nft.sellerUsername}</Text>
+            <Text color={'gray.500'}>Feb 08, 2021</Text>
             <Button
                 onClick={ () => buyNFT(props.nft) }
-                // isLoading={ isSaving }
+                isLoading={ isMinting }
                 // disabled={ isSaving }
                 variant="solid"
                 bg="#0D74FF"
                 color="white"
                 _hover={{}}>
-                {`Buy now for ${props.nft.askingPrice}`}
+                {`Buy now for ${props.nft.askingPrice} ETH`}
             </Button>
           </Stack>
         </Stack>

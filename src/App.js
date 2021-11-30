@@ -10,6 +10,7 @@ import ViewDivePhoto from './pages/DivePhotos/ViewDivePhoto'
 import Marketplace from './pages/Marketplace'
 import ViewProfile from './pages/Users/ViewProfile'
 import LogIn from './pages/LogIn'
+import NFTDrops from './pages/NFTDrops.js'
 
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
@@ -20,20 +21,22 @@ function App() {
       <TopNav />
       <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="dive_photos">
-            <Route path="create" element={<CreateDivePhoto />} />
+          {/* <Route path="dive_photos"> */}
+            {/* <Route path="create" element={<CreateDivePhoto />} /> */}
             {/* <Route path=":id" element={<ViewDivePhoto />} /> */}
-          </Route>
+          {/* </Route> */}
           <Route path="profile" element={<UserProfileEdit />} />
           {/* <Route path="/profile/:id/edit" element={<UserProfileEdit />} /> */}
           <Route path="user/settings" element={<UserProfileEdit />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="login" element={<LogIn />} />
-          <Route path="createdivephoto" element={<CreateDivePhoto />} />
+          {/* <Route path="createdivephoto" element={<CreateDivePhoto />} /> */}
           <Route path="mydivephotos" element={<MyDivePhotos />} />
           <Route path="marketplace" element={<Marketplace />} />
+          <Route path="divephotos/create" element={<CreateDivePhoto />} />
           <Route path="divephoto/:uid" element={<ViewDivePhoto />} />
           <Route path="user/me" element={<ViewProfile />} />
+          <Route path="nftdrops" element={<NFTDrops />} />
       </Routes>
       
       {/* { isAuthenticated ? 

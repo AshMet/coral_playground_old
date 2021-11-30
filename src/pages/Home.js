@@ -1,5 +1,7 @@
-import { Container, Flex, Box, chakra, Image, Link, useColorModeValue } from "@chakra-ui/react";
+import { Container, Flex, Text, Box, chakra, Button, Stack, Link, useColorModeValue } from "@chakra-ui/react";
 import { useMoralis } from "react-moralis"
+import { IoWalletOutline } from "react-icons/io5"
+import { FaBitcoin } from "react-icons/fa";
 
 
 export const Home = () => {
@@ -7,9 +9,16 @@ export const Home = () => {
     const { isAuthenticated, user } = useMoralis();
     
     return(
+    <Flex
+      w={'full'}
+      h={'100vh'}
+      backgroundImage={
+        'url(https://miro.medium.com/max/1838/1*nLDCAvHPZ4IHlnNjQ9J0QA.jpeg)'
+      }
+      backgroundSize={'cover'}
+      backgroundPosition={'center center'}>
       <Container pt={10}>
         <Flex
-            bg={useColorModeValue("#F9FAFB", "gray.600")}
             p={50}
             w="full"
             alignItems="center"
@@ -22,6 +31,7 @@ export const Home = () => {
             rounded="lg"
             shadow="lg"
             bg={useColorModeValue("white", "gray.800")}
+            opacity={0.8}
             maxW="2xl"
             >
             <Flex justifyContent="space-between" alignItems="center">
@@ -46,18 +56,14 @@ export const Home = () => {
             </Flex>
     
             <Box mt={2}>
-                <Link
-                
+                <Text
                 fontSize="2xl"
+                align="center"
                 color={useColorModeValue("gray.700", "white")}
                 fontWeight="700"
-                _hover={{
-                    color: useColorModeValue("gray.600", "gray.200"),
-                    textDecor: "underline",
-                }}
                 >
-                { isAuthenticated ? `Welcome to Coral Playground ${user && user.attributes.username}` : "🦊 Please connect wallet to begin" }
-                </Link>
+                { isAuthenticated ? `Welcome to Coral Playground ${user && user.attributes.username}` : "Coral Playground" }
+                </Text>
                 <chakra.p mt={2} color={useColorModeValue("gray.600", "gray.300")}>
                 Coral playground is an NFT marketplace for underwater photographers to sell their work with a portion of the sale 
                 going to benefit marine preservation and coral regeneration initiatives. Divers will also be able to commemorate 
@@ -66,36 +72,19 @@ export const Home = () => {
                 </chakra.p>
             </Box>
     
-            <Flex justifyContent="space-between" alignItems="center" mt={4}>
-                <Link
-                color={useColorModeValue("brand.600", "brand.400")}
-                _hover={{ textDecor: "underline" }}
-                >
-                {/* Read more */}
-                </Link>
-    
-                <Flex alignItems="center">
-                <Image
-                    mx={4}
-                    w={10}
-                    h={10}
-                    rounded="full"
-                    fit="cover"
-                    display={{ base: "none", sm: "block" }}
-                    src="https://images.unsplash.com/photo-1502980426475-b83966705988?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=40&q=80"
-                    alt="avatar"
-                />
-                <Link
-                    color={useColorModeValue("gray.700", "gray.200")}
-                    fontWeight="700"
-                    cursor="pointer"
-                >
-                    Ash Met
-                </Link>
-                </Flex>
+            <Flex justifyContent="center" alignItems="center" mt={4}>
+                <Stack direction='row' spacing={4}>
+                    <Button leftIcon={<IoWalletOutline />} colorScheme='teal' variant='solid'>
+                        Connect Wallet
+                    </Button>
+                    <Button rightIcon={<FaBitcoin />} colorScheme='teal' variant='outline'>
+                        Buy Crypto
+                    </Button>
+                </Stack>
             </Flex>
             </Box>
         </Flex>
     </Container>
+    </Flex>
     )
 }

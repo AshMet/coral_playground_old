@@ -19,6 +19,7 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { IoLogOutOutline, IoChevronDown, IoWalletOutline, IoLogInOutline } from "react-icons/io5"
+import { FaBitcoin } from "react-icons/fa";
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { useMoralis } from "react-moralis"
 import { Settings } from './pages/Settings';
@@ -45,8 +46,14 @@ const NavLink = (props) => (
 
 export default function TopNav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isAuthenticated, logout, user, isAuthUndefined, isAuthenticating, authenticate } = useMoralis();
+  const { isAuthenticated, logout, user, isAuthUndefined, isAuthenticating, authenticate, Moralis } = useMoralis();
   let navigate = useNavigate();
+
+
+  const getFiat = async function () {
+    Moralis.initPlugins()
+    await Moralis.Plugins.fiat.buy()
+  }
 
   return (
     <Box bg={useColorModeValue('purple.900', 'purple.900')} px={4}>
@@ -66,7 +73,8 @@ export default function TopNav() {
             display={{ base: 'none', md: 'flex' }}>
               <NavLink link='/' title='Home' />
               <NavLink link='marketplace' title='Marketplace' />
-              { isAuthenticated && <NavLink link='dive_photos/create' title='Create NFT' /> }
+              <NavLink link='nftdrops' title='NFT Drops' />
+              { isAuthenticated && <NavLink link='divephotos/create' title='Create NFT' /> }
               { isAuthenticated && <NavLink link='mydivephotos' title='My Dive Photos' /> }
               }
             {/* {Links.map((link) => (
@@ -85,11 +93,20 @@ export default function TopNav() {
           </Menu>
         </Flex>
         <HStack spacing={{ base: '0', md: '6' }}>
+          <IconButton
+            onClick={() => getFiat()}
+            colorScheme={'teal'}
+            size="lg"
+            variant="ghost"
+            aria-label="Buy Crypto"
+            icon={<FaBitcoin />}
+          />
           { !isAuthenticated ? 
             <Stack direction="row" spacing={4}>
               <IconButton
                 isLoading={isAuthenticating} 
                 onClick={() => authenticate()}
+                colorScheme={'teal'}
                 size="lg"
                 variant="ghost"
                 aria-label="Connect Wallet"
@@ -116,6 +133,7 @@ export default function TopNav() {
                   <HStack>
                     <Avatar
                       name={user.attributes.username }
+                      src={user.attributes?.avatar?._url}
                       size={'sm'}
                     />
                     <VStack

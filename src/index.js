@@ -12,6 +12,7 @@ import { MoralisProvider } from "react-moralis";
 const theme = extendTheme({
   config: {
     initialColorMode: 'dark',
+    useSystemColorMode: false
   }
 })
 
